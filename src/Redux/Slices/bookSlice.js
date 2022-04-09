@@ -1,10 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit";
-import books from "../../fakeData/books.json";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+// import books from "../../fakeData/books.json";
+
+// First, create the thunk
+export const fetchBooks = createAsyncThunk(
+  "books/fetchByIdStatus",
+  async () => {
+    const response = await fetch(
+      "https://redux-book-shelf.herokuapp.com/books"
+    ).then((res) => res.json());
+
+    return response.data;
+  }
+);
 
 const bookSlice = createSlice({
   name: "book",
   initialState: {
-    discover: books,
+    discover: [],
     readingList: [],
     finishedList: [],
   },
@@ -23,6 +35,11 @@ const bookSlice = createSlice({
         (book) => book.id !== action.payload.id
       );
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchBooks.fulfilled, (state, action) => {
+      state.discover = action.payload;
+    });
   },
 });
 
